@@ -1,6 +1,8 @@
 import random
 import os
 
+high_score = [15]
+first_place = ["Niel Armstrong"]
 
 CELLS = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0),
          (0, 1), (1, 1), (2, 1), (3, 1), (4, 1),
@@ -13,6 +15,7 @@ def clear_screen():
 
 def get_locations():
     return random.sample(CELLS, 3)
+
     
 def move_player(player, move):
     x, y = player
@@ -27,7 +30,7 @@ def move_player(player, move):
     return x, y
 
 def get_moves(player):
-    moves = ["LEFT", "RIGHT", "UP", "DOWN"] #this is a list
+    moves = ["LEFT", "RIGHT", "UP", "DOWN"]
     x, y = player
     if y == 0:
         moves.remove("UP")
@@ -39,7 +42,7 @@ def get_moves(player):
         moves.remove("RIGHT")
     return moves
 
-def draw_map(player):
+def draw_map(player, door, monster):
     print(" _" * 5)
     tile = "|{}"
     
@@ -49,23 +52,38 @@ def draw_map(player):
             line_end = ""
             if cell == player:
                 output = tile.format("X")
+            elif cell == door:
+                output = tile.format("O")
+            elif cell == monster:
+                output = tile.format("M")
             else:
                 output = tile.format("_")
         else:
             line_end = "\n"
             if cell == player:
                 output = tile.format("X|")
+            elif cell == door:
+                output = tile.format("O|")
+            elif cell == monster:
+                output = tile.format("M|")
             else:
                 output = tile.format("_|")
         print(output, end = line_end)
 
 def game_loop():
+    global high_score
+    global first_place
     player, door, monster = get_locations()
     playing = True
+    move_count = 0
+    input("The high score is currently held by {} with a score of {}!".format(first_place[0], high_score[0]))
+    clear_screen()
     
     while playing:
         clear_screen()
-        draw_map(player)
+        high_score.sort()
+        
+        draw_map(player, door, monster)
         valid_moves = get_moves(player)
         
         print("You're currently in room {}".format(player))
@@ -74,27 +92,41 @@ def game_loop():
         
         move = input("> ")
         move = move.upper()
+        clear_screen()
         
         if move == 'QUIT':
             print("\n** See you next time! **\n")
             break
         if move in valid_moves:
+            move_count += 1
             player = move_player(player, move)
+            clear_screen()
+            draw_map(player, door, monster)
+            
             
             if player == monster:
                 print("\n ** Oh no! The monster fot you! Better luck next time **\n")
                 playing = False
             if player == door:
-                print("\n** You escaped! Congratulations! **\n")
+                new_high = move_count
+                high_score.sort()
+                print("\n** You escaped in {} moves! Congratulations! **\n".format(new_high))
+                if new_high < high_score[0]:
+                    high_score.insert(0, new_high)
+                    print("\n** You have the new high score!!! **\n")
+                    first_place = input("What is your name? \n > ")
+                else:
+                    print("The high score is still held by {} with a score of {}!".format(first_place[0], high_score[0]))
                 playing = False
         else:
             input("\n ** Walls are hard! Don't run into them! **\n")
     else:
         if input("Play again? [Y/n]").lower != "n":
             game_loop()
-clear_screen()
-print("Welcome to the dungeon!")
-input("Press return to start!")
-clear_screen
-game_loop()
-    
+            
+if __name__ == '__main__':
+    clear_screen()
+    print("Welcome to the dungeon!")
+    input("Press return to start!")
+    clear_screen
+    game_loop()
