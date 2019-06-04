@@ -2,7 +2,7 @@ import random
 import os
 
 high_score = [15]
-first_place = ["Niel Armstrong"]
+first_place = "Niel Armstrong"
 
 CELLS = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0),
          (0, 1), (1, 1), (2, 1), (3, 1), (4, 1),
@@ -76,7 +76,7 @@ def game_loop():
     player, door, monster = get_locations()
     playing = True
     move_count = 0
-    input("The high score is currently held by {} with a score of {}!".format(first_place[0], high_score[0]))
+    input("The high score is currently held by {} with a score of {}!".format(first_place, high_score[0]))
     clear_screen()
     
     while playing:
